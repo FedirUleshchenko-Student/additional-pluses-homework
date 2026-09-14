@@ -1,2 +1,2 @@
 # additional-pluses-homework
-3 semester homework homework of additional c++
+3 semester homework of additional c++
