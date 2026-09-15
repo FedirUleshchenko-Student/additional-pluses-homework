@@ -45,7 +45,10 @@ public:
     {
         // --- НАПИШІТЬ ВАШ КОД ТУТ ---
 
-
+        std::for_each(getInventory().begin(), getInventory().end(),
+            [pr = predicate, ac = action](auto x) {
+                if (pr(x)) ac(x);
+            });
         // ----------------------------
     }
 };
@@ -60,8 +63,16 @@ public:
 std::optional<Item> findBestItem(const std::vector<Item>& inventory, ItemType targetType) {
     // --- НАПИШІТЬ ВАШ КОД ТУТ ---
 
+    bool flag = false;
+    Item t = Item{ "None", ItemType::WEAPON, 0, 0, true };
+    std::for_each(inventory.begin(), inventory.end(),
+        [targetType, &t, &flag](const Item& x) {
+            if (x.type != targetType) return;
+            if (t.price < x.price) { t = x; flag = true; }
+        });
 
-    return std::nullopt; // Заглушка
+    if (flag) return t;
+    return std::nullopt;
     // ----------------------------
 }
 
@@ -90,7 +101,13 @@ int main() {
 
 
     // --- НАПИШІТЬ ВАШ КОД ТУТ ---
-
+    hero.triggerEvents(
+        [](const Item& i) -> bool {
+            return i.type == ItemType::WEAPON && i.level > 5;
+        },
+        [](const Item& i) {
+            std::cout << "[ALERT] High level weapon found: <" << i.name << ">" << std::endl;
+        });
 
 
 
@@ -106,7 +123,19 @@ int main() {
 
     // --- НАПИШІТЬ ВАШ КОД ТУТ ---
 
+    double totalRevenue = 0.0;
+    auto sellItem = [totalRevenue](double itemPrice) mutable {
+        return totalRevenue += itemPrice;
+        };
 
+    std::vector<Item> itemsForSale = {
+        {"Mace", ItemType::WEAPON, 2, 50.0, true},
+        {"Scroll of Funny Hat Creation", ItemType::SCROLL, 15, 120.0, true},
+        {"Broken Shield", ItemType::ARMOR, 1, 30.0, true}
+    };
+
+    std::for_each(itemsForSale.begin(), itemsForSale.end(),
+        [sellItem](Item i) mutable { std::cout << "Total selled value = " << sellItem(i.price) << std::endl; });
 
 
     std::cout << "\n=== TASK 4: std::ranges & Views (C++20) ===" << std::endl;
@@ -122,7 +151,13 @@ int main() {
 
     // --- НАПИШІТЬ ВАШ КОД ТУТ ---
 
-
+    for (auto&& item_info :
+        std::views::take(
+            std::views::transform(std::views::filter(hero.getInventory(), [](Item i) -> bool {return !i.isBroken; }),
+                [](Item i) {
+                    return i.name + " (New Price : " + std::to_string(int(i.price * 1.2)) + ")"; }), 3)) {
+        std::cout << item_info << std::endl;
+    }
 
 
     std::cout << "\n=== TASK 5: std::optional ===" << std::endl;
