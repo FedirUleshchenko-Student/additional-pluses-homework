@@ -5,6 +5,7 @@
 #include <mutex>
 #include <semaphore>
 #include <chrono>
+#include <syncstream>
 
 
 // Спільний ресурс: спільний лог-звіт
@@ -21,7 +22,7 @@ std::vector<std::string> deliveryLog;
 
 // Функція, яку виконує кожен кур'єр (потік)
 void courierTask(int courierId) {
-    std::cout << "[Courier " << courierId << "] Arrived at hub, waiting for free packing terminal...\n";
+    std::osyncstream(std::cout) << "[Courier " << courierId << "] Arrived at hub, waiting for free packing terminal...\n";
 
 
     // TODO 3: Захопіть перепустку у семафора (acquire). 
@@ -29,7 +30,7 @@ void courierTask(int courierId) {
     terminalSemaphore.acquire();
 
 
-    std::cout << "  >>> [Courier " << courierId << "] STARTED packing at terminal!\n";
+    std::osyncstream(std::cout) << "  >>> [Courier " << courierId << "] STARTED packing at terminal!\n";
     std::this_thread::sleep_for(std::chrono::milliseconds(800)); // Імітація пакування
     
     std::string report = "Courier #" + std::to_string(courierId) + " successfully delivered package.";
@@ -44,7 +45,7 @@ void courierTask(int courierId) {
     }
 
 
-    std::cout << "  <<< [Courier " << courierId << "] FINISHED packing. Freeing terminal.\n";
+    std::osyncstream(std::cout) << "  <<< [Courier " << courierId << "] FINISHED packing. Freeing terminal.\n";
 
 
     // TODO 5: Поверніть перепустку семафору (release).
